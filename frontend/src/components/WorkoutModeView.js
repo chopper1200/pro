@@ -4,10 +4,14 @@ import { useStore } from "@/store/StoreContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   Play, Check, Plus, Minus, ChevronLeft, ChevronRight, Timer, X,
-  ExternalLink, Info, Trash2, Flag,
+  ExternalLink, Info, Trash2, Flag, Sparkles, Trophy, Award,
 } from "lucide-react";
 
 function vibrate(pattern, enabled) {
@@ -28,6 +32,7 @@ export default function WorkoutModeView() {
   const navigate = useNavigate();
 
   const [rest, setRest] = useState({ total: 0, remaining: null });
+  const [summary, setSummary] = useState(null);
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -85,9 +90,13 @@ export default function WorkoutModeView() {
   };
 
   const onFinish = () => {
-    const n = finishSession();
-    toast.success(n > 0 ? `Sessione salvata (${n} esercizi registrati)` : "Sessione chiusa");
-    navigate("/");
+    const s = finishSession();
+    if (!s || s.count === 0) {
+      toast.success("Sessione chiusa");
+      navigate("/");
+      return;
+    }
+    setSummary(s);
   };
 
   const onCancel = () => {
@@ -143,6 +152,16 @@ export default function WorkoutModeView() {
                 </a>
               )}
             </div>
+
+            {ex.suggestionLabel && (
+              <div className="flex items-center gap-2 text-sm rounded-lg p-2.5 bg-primary/10 border border-primary/30" data-testid="overload-suggestion">
+                <Sparkles className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-foreground">
+                  Sovraccarico progressivo: <span className="font-semibold text-primary">{ex.suggestionLabel}</span>
+                  <span className="text-muted-foreground"> (precompilato)</span>
+                </span>
+              </div>
+            )}
 
             {ex.note && (
               <div className="flex gap-2 text-sm bg-secondary/60 rounded-lg p-3">
@@ -270,6 +289,68 @@ export default function WorkoutModeView() {
           </Card>
         </div>
       )}
+
+      <Dialog open={!!summary} onOpenChange={(o) => { if (!o) { setSummary(null); navigate("/"); } }}>
+        <DialogContent className="max-w-md rounded-2xl" data-testid="session-summary-dialog">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-3xl font-black uppercase flex items-center gap-2">
+              <Trophy className="w-7 h-7 text-primary" /> Sessione conclusa
+            </DialogTitle>
+            <DialogDescription>Ecco il riepilogo del tuo allenamento.</DialogDescription>
+          </DialogHeader>
+
+          {summary && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <Card className="p-3">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Volume totale</p>
+                  <p className="font-stat text-3xl font-black mt-1" data-testid="summary-total-volume">
+                    {summary.totalVolume.toLocaleString("it-IT")}
+                    <span className="text-sm font-bold text-muted-foreground"> {summary.unit}</span>
+                  </p>
+                </Card>
+                <Card className="p-3">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Record battuti</p>
+                  <p className="font-stat text-3xl font-black mt-1 text-primary" data-testid="summary-pr-count">
+                    {summary.prCount}
+                  </p>
+                </Card>
+              </div>
+
+              <div className="space-y-2 max-h-[38vh] overflow-y-auto pr-1">
+                {summary.exercises.map((ex, i) => (
+                  <div key={i} className="flex items-center justify-between gap-2 rounded-lg bg-secondary/50 p-3" data-testid={`summary-exercise-${i}`}>
+                    <div className="min-w-0">
+                      <p className="font-semibold truncate">{ex.name}</p>
+                      <p className="text-xs text-muted-foreground font-stat">
+                        {ex.sets} serie · {ex.volume.toLocaleString("it-IT")} {summary.unit} · max {ex.maxW}{summary.unit}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      {ex.prWeight && (
+                        <Badge className="rounded-md bg-primary/20 text-primary border-0">
+                          <Award className="w-3 h-3 mr-1" /> PR peso
+                        </Badge>
+                      )}
+                      {ex.pr1rm && (
+                        <Badge className="rounded-md bg-emerald-500/20 text-emerald-500 border-0">
+                          <Trophy className="w-3 h-3 mr-1" /> PR forza
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button onClick={() => { setSummary(null); navigate("/"); }} className="w-full h-12 rounded-xl" data-testid="summary-close-button">
+              <Check className="w-5 h-5 mr-1" /> Fatto
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Reorder, useDragControls } from "framer-motion";
 import { useStore } from "@/store/StoreContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import {
-  Plus, Copy, Trash2, Star, Pencil, ChevronUp, ChevronDown, Dumbbell, CalendarPlus, Check,
+  Plus, Copy, Trash2, Star, Pencil, GripVertical, Dumbbell, CalendarPlus, Check,
 } from "lucide-react";
 
 const EMPTY_EX = { name: "", sets: 3, reps: "10-12", rest: 90, note: "", image: "", guideLink: "" };
@@ -143,37 +144,14 @@ export default function PlanEditorView() {
                         </div>
                         <AccordionContent className="space-y-3 pb-3">
                           {week.days.map((day) => (
-                            <div key={day.id} className="rounded-lg bg-secondary/40 p-3 space-y-2" data-testid={`day-block-${day.id}`}>
-                              <div className="flex items-center justify-between">
-                                <p className="font-heading text-lg font-bold uppercase">{day.name}</p>
-                                <div className="flex gap-1">
-                                  <IconBtn label="Rinomina giorno" onClick={() => {
-                                    const n = window.prompt("Nome giorno", day.name);
-                                    if (n && n.trim()) store.renameDay(plan.id, week.id, day.id, n.trim());
-                                  }}><Pencil className="w-3.5 h-3.5" /></IconBtn>
-                                  <IconBtn label="Elimina giorno" danger onClick={() => window.confirm("Eliminare il giorno?") && store.deleteDay(plan.id, week.id, day.id)}><Trash2 className="w-3.5 h-3.5" /></IconBtn>
-                                </div>
-                              </div>
-
-                              {day.exercises.map((ex, i) => (
-                                <div key={ex.id} className="flex items-center gap-2 bg-background rounded-lg p-2" data-testid={`exercise-row-${ex.id}`}>
-                                  <div className="flex flex-col">
-                                    <button className="w-6 h-5 flex items-center justify-center text-muted-foreground disabled:opacity-30" disabled={i === 0} onClick={() => store.moveExercise(plan.id, week.id, day.id, ex.id, -1)} aria-label="Su"><ChevronUp className="w-4 h-4" /></button>
-                                    <button className="w-6 h-5 flex items-center justify-center text-muted-foreground disabled:opacity-30" disabled={i === day.exercises.length - 1} onClick={() => store.moveExercise(plan.id, week.id, day.id, ex.id, 1)} aria-label="Giù"><ChevronDown className="w-4 h-4" /></button>
-                                  </div>
-                                  <button className="flex-1 min-w-0 text-left" onClick={() => openExDialog(plan.id, week.id, day.id, ex)}>
-                                    <p className="font-semibold truncate">{ex.name}</p>
-                                    <p className="text-xs text-muted-foreground">{ex.sets}×{ex.reps} · rec {ex.rest}s</p>
-                                  </button>
-                                  <IconBtn label="Modifica esercizio" testid={`edit-exercise-${ex.id}`} onClick={() => openExDialog(plan.id, week.id, day.id, ex)}><Pencil className="w-4 h-4" /></IconBtn>
-                                  <IconBtn label="Elimina esercizio" danger testid={`delete-exercise-${ex.id}`} onClick={() => store.deleteExercise(plan.id, week.id, day.id, ex.id)}><Trash2 className="w-4 h-4" /></IconBtn>
-                                </div>
-                              ))}
-
-                              <Button variant="outline" className="w-full h-10 rounded-lg border-dashed" onClick={() => openExDialog(plan.id, week.id, day.id, null)} data-testid={`add-exercise-${day.id}`}>
-                                <Dumbbell className="w-4 h-4 mr-1" /> Aggiungi esercizio
-                              </Button>
-                            </div>
+                            <DayEditor
+                              key={day.id}
+                              store={store}
+                              plan={plan}
+                              week={week}
+                              day={day}
+                              openExDialog={openExDialog}
+                            />
                           ))}
 
                           <Button variant="secondary" className="w-full h-10 rounded-lg" onClick={() => store.addDay(plan.id, week.id)} data-testid={`add-day-${week.id}`}>
@@ -239,6 +217,79 @@ export default function PlanEditorView() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function DayEditor({ store, plan, week, day, openExDialog }) {
+  const [items, setItems] = useState(day.exercises);
+  const snapshot = JSON.stringify(day.exercises.map((e) => e.id + e.name + e.sets + e.reps + e.rest));
+
+  useEffect(() => {
+    setItems(day.exercises);
+  }, [snapshot]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onReorder = (next) => {
+    setItems(next);
+    store.reorderExercises(plan.id, week.id, day.id, next.map((e) => e.id));
+  };
+
+  return (
+    <div className="rounded-lg bg-secondary/40 p-3 space-y-2" data-testid={`day-block-${day.id}`}>
+      <div className="flex items-center justify-between">
+        <p className="font-heading text-lg font-bold uppercase">{day.name}</p>
+        <div className="flex gap-1">
+          <IconBtn label="Rinomina giorno" onClick={() => {
+            const n = window.prompt("Nome giorno", day.name);
+            if (n && n.trim()) store.renameDay(plan.id, week.id, day.id, n.trim());
+          }}><Pencil className="w-3.5 h-3.5" /></IconBtn>
+          <IconBtn label="Elimina giorno" danger onClick={() => window.confirm("Eliminare il giorno?") && store.deleteDay(plan.id, week.id, day.id)}><Trash2 className="w-3.5 h-3.5" /></IconBtn>
+        </div>
+      </div>
+
+      <Reorder.Group as="div" axis="y" values={items} onReorder={onReorder} className="space-y-2">
+        {items.map((ex) => (
+          <ExerciseRow
+            key={ex.id}
+            ex={ex}
+            onEdit={() => openExDialog(plan.id, week.id, day.id, ex)}
+            onDelete={() => store.deleteExercise(plan.id, week.id, day.id, ex.id)}
+          />
+        ))}
+      </Reorder.Group>
+
+      <Button variant="outline" className="w-full h-10 rounded-lg border-dashed" onClick={() => openExDialog(plan.id, week.id, day.id, null)} data-testid={`add-exercise-${day.id}`}>
+        <Dumbbell className="w-4 h-4 mr-1" /> Aggiungi esercizio
+      </Button>
+    </div>
+  );
+}
+
+function ExerciseRow({ ex, onEdit, onDelete }) {
+  const controls = useDragControls();
+  return (
+    <Reorder.Item
+      as="div"
+      value={ex}
+      dragListener={false}
+      dragControls={controls}
+      className="flex items-center gap-2 bg-background rounded-lg p-2 touch-none"
+      data-testid={`exercise-row-${ex.id}`}
+    >
+      <button
+        onPointerDown={(e) => controls.start(e)}
+        className="w-8 h-9 flex items-center justify-center text-muted-foreground cursor-grab active:cursor-grabbing touch-none"
+        aria-label="Trascina per riordinare"
+        data-testid={`drag-handle-${ex.id}`}
+      >
+        <GripVertical className="w-5 h-5" />
+      </button>
+      <button className="flex-1 min-w-0 text-left" onClick={onEdit}>
+        <p className="font-semibold truncate">{ex.name}</p>
+        <p className="text-xs text-muted-foreground">{ex.sets}×{ex.reps} · rec {ex.rest}s</p>
+      </button>
+      <IconBtn label="Modifica esercizio" testid={`edit-exercise-${ex.id}`} onClick={onEdit}><Pencil className="w-4 h-4" /></IconBtn>
+      <IconBtn label="Elimina esercizio" danger testid={`delete-exercise-${ex.id}`} onClick={onDelete}><Trash2 className="w-4 h-4" /></IconBtn>
+    </Reorder.Item>
   );
 }
 

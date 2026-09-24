@@ -5,9 +5,11 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  useRef,
 } from "react";
 import { loadState, saveState, serializeBackup } from "@/lib/db";
 import { CURRENT_SCHEMA } from "@/lib/seed";
+import { suggestFromLastLog, buildSessionSummary } from "@/lib/progression";
 import { uid } from "@/lib/id";
 
 const StoreContext = createContext(null);
@@ -36,6 +38,8 @@ function lastLogForName(logs, name) {
 export function StoreProvider({ children }) {
   const [state, setState] = useState(null);
   const [ready, setReady] = useState(false);
+  const stateRef = useRef(null);
+  stateRef.current = state;
 
   useEffect(() => {
     loadState().then((s) => {
@@ -204,6 +208,16 @@ export function StoreProvider({ children }) {
           [d.exercises[i], d.exercises[j]] = [d.exercises[j], d.exercises[i]];
         }),
 
+      reorderExercises: (planId, weekId, dayId, orderedIds) =>
+        update((s) => {
+          const d = findPlan(s, planId)?.weeks
+            .find((x) => x.id === weekId)?.days.find((x) => x.id === dayId);
+          if (!d) return;
+          const map = new Map(d.exercises.map((e) => [e.id, e]));
+          const next = orderedIds.map((id) => map.get(id)).filter(Boolean);
+          if (next.length === d.exercises.length) d.exercises = next;
+        }),
+
       startSession: ({ planId, weekId, dayId }) =>
         update((s) => {
           const plan = findPlan(s, planId);
@@ -212,12 +226,16 @@ export function StoreProvider({ children }) {
           if (!day) return;
           const entries = day.exercises.map((ex) => {
             const last = lastLogForName(s.logs, ex.name);
+            const suggestion = suggestFromLastLog(last, ex, s.settings.unit);
             const count = Math.max(1, parseInt(ex.sets, 10) || 3);
-            const sets = Array.from({ length: count }, (_, i) => ({
-              weight: last?.sets[i]?.weight ?? "",
-              reps: last?.sets[i]?.reps ?? "",
-              done: false,
-            }));
+            const sets = Array.from({ length: count }, (_, i) => {
+              const src = suggestion?.sets[i] ?? last?.sets[i];
+              return {
+                weight: src != null && src.weight !== undefined ? String(src.weight) : "",
+                reps: src != null && src.reps !== undefined ? String(src.reps) : "",
+                done: false,
+              };
+            });
             return {
               exerciseId: ex.id,
               name: ex.name,
@@ -226,6 +244,7 @@ export function StoreProvider({ children }) {
               guideLink: ex.guideLink,
               target: ex.reps,
               rest: parseInt(ex.rest, 10) || s.settings.defaultRest,
+              suggestionLabel: suggestion?.label || null,
               sets,
             };
           });
@@ -265,14 +284,15 @@ export function StoreProvider({ children }) {
         }),
 
       finishSession: () => {
-        let logged = 0;
+        const cur = stateRef.current;
+        if (!cur || !cur.session) return { count: 0, exercises: [], totalVolume: 0, prCount: 0 };
+        const summary = buildSessionSummary(cur.logs, cur.session, cur.settings.unit);
         update((s) => {
           if (!s.session) return;
           const date = new Date().toISOString();
           s.session.entries.forEach((en) => {
             const done = en.sets.filter((st) => st.done && (st.weight !== "" || st.reps !== ""));
             if (done.length === 0) return;
-            logged += 1;
             s.logs.push({
               id: uid(),
               date,
@@ -285,7 +305,7 @@ export function StoreProvider({ children }) {
           });
           s.session = null;
         });
-        return logged;
+        return summary;
       },
 
       cancelSession: () => update((s) => { s.session = null; }),
