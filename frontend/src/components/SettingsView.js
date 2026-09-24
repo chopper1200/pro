@@ -64,7 +64,7 @@ export default function SettingsView() {
       </div>
 
       <Card className="p-4 space-y-4">
-        <Row icon={settings.theme === "dark" ? Moon : Sun} title="Tema" desc="Aspetto dell'app">
+        <Row icon={settings.theme === "dark" ? Moon : Sun} title="Tema" desc={"Aspetto dell\u2019app"}>
           <div className="flex rounded-lg bg-secondary p-1">
             {["dark", "light"].map((t) => (
               <button
@@ -111,7 +111,7 @@ export default function SettingsView() {
             <Timer className="w-5 h-5 text-primary" />
             <div className="flex-1">
               <p className="font-semibold">Recupero di default</p>
-              <p className="text-xs text-muted-foreground">Usato quando l'esercizio non ne ha uno</p>
+              <p className="text-xs text-muted-foreground">Usato quando l{"\u2019"}esercizio non ne ha uno</p>
             </div>
             <span className="font-stat text-xl font-bold text-primary" data-testid="default-rest-value">
               {settings.defaultRest}s
@@ -132,8 +132,8 @@ export default function SettingsView() {
           <p className="font-heading text-lg font-bold uppercase">Backup dati</p>
         </div>
         <p className="text-sm text-muted-foreground">
-          I dati vivono solo su questo dispositivo (IndexedDB). Esporta regolarmente: è la tua unica
-          rete di sicurezza.
+          I dati vivono solo su questo dispositivo (IndexedDB). Esporta regolarmente: {"è"} la tua
+          unica rete di sicurezza.
         </p>
         <div className="grid grid-cols-2 gap-2">
           <Button onClick={doExport} data-testid="export-json-button" className="h-12 rounded-xl">

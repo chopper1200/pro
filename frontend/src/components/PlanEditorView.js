@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Accordion, AccordionItem, AccordionTrigger, AccordionContent,
@@ -200,6 +200,9 @@ export default function PlanEditorView() {
             <DialogTitle className="font-heading text-2xl font-black uppercase">
               {editing?.exId ? "Modifica esercizio" : "Nuovo esercizio"}
             </DialogTitle>
+            <DialogDescription>
+              Compila i campi dell{"\u2019"}esercizio. Solo il nome è obbligatorio.
+            </DialogDescription>
           </DialogHeader>
           {editing && (
             <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">

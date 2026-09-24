@@ -15,7 +15,7 @@ function startOfWeek() {
 }
 
 export default function HomeView() {
-  const { activePlan, activeWeekId, setActiveWeek, logs, startSession, session } = useStore();
+  const { activePlan, activeWeekId, setActiveWeek, logs, startSession, session, settings } = useStore();
   const navigate = useNavigate();
   const [pickWeek, setPickWeek] = useState(activeWeekId);
 
@@ -94,7 +94,7 @@ export default function HomeView() {
           </div>
           <p className="font-stat text-4xl font-black mt-1" data-testid="stat-total-volume">
             {Math.round(totalVolume).toLocaleString("it-IT")}
-            <span className="text-base font-bold text-muted-foreground"> kg</span>
+            <span className="text-base font-bold text-muted-foreground"> {settings.unit}</span>
           </p>
         </Card>
       </div>
@@ -131,7 +131,7 @@ export default function HomeView() {
           <Card className="p-6 text-center text-sm text-muted-foreground">
             Nessun giorno in questa settimana.{" "}
             <button className="text-primary font-semibold" onClick={() => navigate("/editor")}>
-              Aggiungi nell'editor
+              Aggiungi nell{"\u2019"}editor
             </button>
           </Card>
         )}

@@ -49,7 +49,7 @@ export function StoreProvider({ children }) {
     const root = document.documentElement;
     if (state.settings.theme === "dark") root.classList.add("dark");
     else root.classList.remove("dark");
-  }, [state?.settings?.theme]);
+  }, [state?.settings?.theme]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = useCallback((mutator) => {
     setState((prev) => {

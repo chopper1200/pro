@@ -278,7 +278,7 @@ function Stepper({ label, value, onDec, onInc, onChange, testid }) {
   return (
     <div className="flex-1 flex items-center gap-1 bg-secondary/50 rounded-lg p-1">
       <button
-        onClick={onDec} aria-label={`meno ${label}`}
+        onClick={onDec} aria-label={`meno ${label}`} data-testid={`${testid}-dec`}
         className="w-9 h-9 rounded-md bg-background flex items-center justify-center text-foreground/70 active:scale-95"
       >
         <Minus className="w-4 h-4" />
@@ -292,7 +292,7 @@ function Stepper({ label, value, onDec, onInc, onChange, testid }) {
         <span className="text-[9px] uppercase tracking-wide text-muted-foreground -mt-0.5">{label}</span>
       </div>
       <button
-        onClick={onInc} aria-label={`più ${label}`}
+        onClick={onInc} aria-label={`più ${label}`} data-testid={`${testid}-inc`}
         className="w-9 h-9 rounded-md bg-background flex items-center justify-center text-foreground/70 active:scale-95"
       >
         <Plus className="w-4 h-4" />
