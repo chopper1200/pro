@@ -1,0 +1,166 @@
+{
+  "project_name": "Inverno Fit",
+  "app_type": "mobile_web_app",
+  "persona_and_vibe": {
+    "identity": "E1 - The Anti-AI Designer",
+    "theme_name": "Inverno (Ice & Slate)",
+    "emotional_archetype": "Performance Pro with Tactical Frost Aesthetics",
+    "target_experience": "Single-user offline PWA designed for heavy gym environments. High-visibility numbers legible at arm's length, sweat-proof 48px+ tap targets, rapid non-blocking interactions, icy high-contrast dark visual design."
+  },
+  "typography": {
+    "heading_font": "Barlow Condensed, Outfit, sans-serif",
+    "body_font": "Inter, system-ui, sans-serif",
+    "mono_font": "JetBrains Mono, monospace",
+    "scale": {
+      "hero_title": "text-4xl sm:text-5xl font-black tracking-tight uppercase",
+      "section_title": "text-2xl sm:text-3xl font-bold tracking-tight uppercase",
+      "card_title": "text-lg sm:text-xl font-semibold tracking-wide",
+      "giant_stat": "text-5xl sm:text-6xl font-black tracking-tighter tabular-nums",
+      "body": "text-base font-normal leading-relaxed",
+      "label_overline": "text-xs font-bold uppercase tracking-[0.2em] text-cyan-400 dark:text-cyan-400"
+    }
+  },
+  "colors": {
+    "default_mode": "dark",
+    "dark_theme": {
+      "background": "#060913",
+      "surface_base": "#0B1120",
+      "surface_card": "#0F172A",
+      "surface_elevated": "#1E293B",
+      "border_subtle": "#1E293B",
+      "border_active": "#0EA5E9",
+      "primary_accent": "#38BDF8",
+      "primary_glow": "rgba(56, 189, 248, 0.25)",
+      "ice_highlight": "#A5F3FC",
+      "text_primary": "#F8FAFC",
+      "text_secondary": "#94A3B8",
+      "text_muted": "#64748B",
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "destructive": "#EF4444"
+    },
+    "light_theme": {
+      "background": "#F1F5F9",
+      "surface_base": "#FFFFFF",
+      "surface_card": "#F8FAFC",
+      "surface_elevated": "#E2E8F0",
+      "border_subtle": "#CBD5E1",
+      "border_active": "#0284C7",
+      "primary_accent": "#0284C7",
+      "primary_glow": "rgba(2, 132, 199, 0.15)",
+      "ice_highlight": "#0369A1",
+      "text_primary": "#0F172A",
+      "text_secondary": "#475569",
+      "text_muted": "#94A3B8",
+      "success": "#059669",
+      "warning": "#D97706",
+      "destructive": "#DC2626"
+    }
+  },
+  "spacing_and_layout": {
+    "touch_targets": "MINIMUM 48px x 48px for all gym-accessible buttons, set completion toggles, and counter controls",
+    "pwa_container": "max-w-md sm:max-w-xl mx-auto min-h-screen flex flex-col pb-24 pt-16 px-4 sm:px-6",
+    "navigation_bar": "fixed bottom-0 left-0 right-0 z-50 bg-[#0B1120]/90 backdrop-blur-xl border-t border-slate-800/80 max-w-md sm:max-w-xl mx-auto px-4 py-2 flex justify-around items-center",
+    "top_bar": "fixed top-0 left-0 right-0 z-40 bg-[#060913]/90 backdrop-blur-md border-b border-slate-800/60 max-w-md sm:max-w-xl mx-auto px-4 h-14 flex justify-between items-center"
+  },
+  "key_components_and_views": {
+    "home_view": {
+      "path": "src/components/HomeView.js",
+      "elements": [
+        "Active Plan Header with week/day switcher pill bar",
+        "Workout of the Day hero card with estimated time, total exercises, start CTA",
+        "Quick statistics (Weekly completed workouts streak, total volume lifted)",
+        "Rest Timer floating bar / status widget"
+      ]
+    },
+    "workout_mode_view": {
+      "path": "src/components/WorkoutModeView.js",
+      "elements": [
+        "Sweat-proof active exercise focus card",
+        "Giant weight (kg/lbs) & reps incremental logger with big + / - touch buttons",
+        "Set completion checkbox with instant visual pulse & vibration trigger (navigator.vibrate)",
+        "Technique note callout box & expandable 'Come si fa' visual guide link",
+        "Floating live Rest Timer overlay with quick +30s / skip buttons and audio chime"
+      ]
+    },
+    "plan_editor_view": {
+      "path": "src/components/PlanEditorView.js",
+      "elements": [
+        "Plan list & Creator modal / sheet (Duplicate, Edit, Delete plans)",
+        "Hierarchical editor: Plan -> Weeks -> Days -> Exercises",
+        "Exercise fields: Name, target sets, reps/time, rest duration, technique note, reference image URL, guide link",
+        "Drag/reorder or arrow-based exercise positioning"
+      ]
+    },
+    "exercise_history_view": {
+      "path": "src/components/ExerciseHistoryView.js",
+      "elements": [
+        "Exercise filter / search bar",
+        "Recharts mini-graph for weight load & estimated 1RM progression",
+        "Historical logs broken down by workout session with individual set weights and reps"
+      ]
+    },
+    "settings_view": {
+      "path": "src/components/SettingsView.js",
+      "elements": [
+        "IndexedDB status & storage diagnostic",
+        "JSON Backup Export button & Import file dropzone",
+        "Default rest timer duration slider (10s - 300s)",
+        "Theme switcher (Inverno Dark / Light mode)"
+      ]
+    }
+  },
+  "image_urls": {
+    "exercise_placeholders": [
+      {
+        "category": "barbell_lift",
+        "url": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTF8MHwxfHNlYXJjaHwyfHxneW0lMjB3b3Jrb3V0JTIwZXhlcmNpc2UlMjBmaXRuZXNzfGVufDB8fHx8MTc5MDIyODU0N3ww&ixlib=rb-4.1.0&q=85",
+        "description": "Person preparing for heavy barbell lift in gym"
+      },
+      {
+        "category": "pullups_back",
+        "url": "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTF8MHwxfHNlYXJjaHwzfHxneW0lMjB3b3Jrb3V0JTIwZXhlcmNpc2UlMjBmaXRuZXNzfGVufDB8fHx8MTc5MDIyODU0N3ww&ixlib=rb-4.1.0&q=85",
+        "description": "Athlete performing pull ups on rig"
+      },
+      {
+        "category": "chest_machine",
+        "url": "https://images.pexels.com/photos/3888405/pexels-photo-3888405.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Focused athlete working out in gym"
+      },
+      {
+        "category": "dumbbells_warmup",
+        "url": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTF8MHwxfHNlYXJjaHxfHxneW0lMjB3b3Jrb3V0JTIwZXhlcmNpc2UlMjBmaXRuZXNzfGVufDB8fHx8MTc5MDIyODU0N3ww&ixlib=rb-4.1.0&q=85",
+        "description": "Dumbbells rack and training room"
+      }
+    ]
+  },
+  "testing_and_accessibility": {
+    "data_testid_convention": "kebab-case, role-based identifiers on every button, input, set row, plan card, navigation tab, timer control, and dialog",
+    "key_test_ids": [
+      "nav-home-tab",
+      "nav-editor-tab",
+      "nav-workout-tab",
+      "nav-history-tab",
+      "nav-settings-tab",
+      "start-workout-button",
+      "exercise-card-item",
+      "set-row-complete-checkbox",
+      "weight-input-field",
+      "reps-input-field",
+      "rest-timer-display",
+      "rest-timer-add-30s",
+      "rest-timer-skip",
+      "export-json-button",
+      "import-json-input",
+      "theme-toggle-button"
+    ],
+    "vibration_feedback": "Trigger navigator.vibrate([100, 50, 100]) on set check off and rest timer completion"
+  },
+  "instructions_to_main_agent": [
+    "Use IndexedDB (via localforage or native IndexedDB API wrapper) for robust offline persistence of plans, workout logs, and user preferences.",
+    "Ensure all tap areas are at least 48px high/wide for gym usability with sweaty hands.",
+    "Do not add any standard Vercel default styling. Use the icy dark 'Inverno' palette with glowing border accents (#0EA5E9).",
+    "Ensure complete responsive mobile-first PWA layout bounded in max-w-md / max-w-xl container so it feels like a native iOS/Android workout app on mobile and desktop.",
+    "All interactive elements must carry proper data-testid attributes for E2E validation."
+  ]
+}
