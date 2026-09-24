@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Reorder, useDragControls } from "framer-motion";
 import { useStore } from "@/store/StoreContext";
 import { Button } from "@/components/ui/button";
@@ -221,17 +221,8 @@ export default function PlanEditorView() {
 }
 
 function DayEditor({ store, plan, week, day, openExDialog }) {
-  const [items, setItems] = useState(day.exercises);
-  const snapshot = JSON.stringify(day.exercises.map((e) => e.id + e.name + e.sets + e.reps + e.rest));
-
-  useEffect(() => {
-    setItems(day.exercises);
-  }, [snapshot]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const onReorder = (next) => {
-    setItems(next);
+  const onReorder = (next) =>
     store.reorderExercises(plan.id, week.id, day.id, next.map((e) => e.id));
-  };
 
   return (
     <div className="rounded-lg bg-secondary/40 p-3 space-y-2" data-testid={`day-block-${day.id}`}>
@@ -246,8 +237,8 @@ function DayEditor({ store, plan, week, day, openExDialog }) {
         </div>
       </div>
 
-      <Reorder.Group as="div" axis="y" values={items} onReorder={onReorder} className="space-y-2">
-        {items.map((ex) => (
+      <Reorder.Group as="div" axis="y" values={day.exercises} onReorder={onReorder} className="space-y-2">
+        {day.exercises.map((ex) => (
           <ExerciseRow
             key={ex.id}
             ex={ex}

@@ -48,12 +48,11 @@ export function StoreProvider({ children }) {
     });
   }, []);
 
+  const theme = state?.settings?.theme;
   useEffect(() => {
-    if (!state) return;
-    const root = document.documentElement;
-    if (state.settings.theme === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-  }, [state?.settings?.theme]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!theme) return;
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
 
   const update = useCallback((mutator) => {
     setState((prev) => {
